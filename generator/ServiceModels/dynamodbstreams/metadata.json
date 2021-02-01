@@ -1,0 +1,6 @@
+{
+    "active": true, 
+    "max-retries": 10, 
+    "namespace": "Amazon.DynamoDBv2", 
+    "parent-base-name": "DynamoDB"
+}

@@ -1,0 +1,10 @@
+{
+    "operationModifiers": {
+        "DescribeExportConfigurations": {
+            "deprecatedMessage": "Deprecated in favor of DescribeExportTasks."
+        },
+        "ExportConfigurations": {
+            "deprecatedMessage": "Deprecated in favor of StartExportTask."
+        }
+    }
+}

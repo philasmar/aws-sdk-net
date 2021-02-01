@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-16"?>
+<property-value-rules>
+  <property-value-rule>
+    <property>Amazon.CloudTrail.Model.LookupEventsRequest.MaxResults</property>
+    <min>1</min>
+    <max>50</max>
+  </property-value-rule>
+  <property-value-rule>
+    <property>Amazon.CloudTrail.Model.AdvancedEventSelector.Name</property>
+    <min>0</min>
+    <max>1000</max>
+    <pattern>.*</pattern>
+  </property-value-rule>
+  <property-value-rule>
+    <property>Amazon.CloudTrail.Model.AdvancedFieldSelector.Field</property>
+    <min>1</min>
+    <max>1000</max>
+    <pattern>[\w|\d|\.|_]+</pattern>
+  </property-value-rule>
+</property-value-rules>

@@ -1,0 +1,5 @@
+{
+    "base-name": "Elasticsearch", 
+    "active": true, 
+    "synopsis": "Use the Amazon Elasticsearch configuration API to create, configure, and manage Elasticsearch domains."
+}

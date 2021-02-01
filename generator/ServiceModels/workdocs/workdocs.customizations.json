@@ -1,0 +1,17 @@
+{
+    "shapeModifiers": {
+        "DescribeActivitiesRequest": {
+            "backwardsCompatibleDateTimeProperties": [
+                "StartTime",
+                "EndTime"
+            ]
+        },
+        "DescribeUsersResponse": {
+            "modify": [
+                {
+                    "TotalNumberOfUsers": { "deprecatedMessage": "This property is deprecated" }
+                }
+            ]
+        }
+    }
+}

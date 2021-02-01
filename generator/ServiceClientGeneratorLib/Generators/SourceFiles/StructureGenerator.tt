@@ -1,0 +1,455 @@
+﻿<#@ template language="C#" inherits="BaseGenerator" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#
+	AddLicenseHeader();
+#>
+using System;
+using System.Collections.Generic;
+using System.Xml.Serialization;
+using System.Text;
+using System.IO;
+using System.Net;
+
+using Amazon.Runtime;
+using Amazon.Runtime.Internal;
+<#
+if(this.StructureType == StructureType.Request && this.Operation.AuthType.HasValue)
+{
+#>
+using Amazon.Runtime.Internal.Auth;
+<#
+}
+#>
+
+namespace <#=this.Config.Namespace#>.Model
+{
+<#
+	if(this.StructureType == StructureType.Request)
+		this.FormatOperationRequestDocumentation(this.Operation);
+	else if (this.Operation != null && GeneratorHelpers.HasSuppressedResult(this.Operation))
+		this.FormatVoidResultDocumentation(this.Operation.Name);
+	else if(this.StructureType == StructureType.Response && (this.Structure == null || string.IsNullOrEmpty(this.Structure.Documentation)))
+	{
+#>
+	/// <summary>
+	/// This is the response object from the <#=this.Operation.Name#> operation.
+	/// </summary>
+<#
+	}
+	else
+	    this.FormatClassDocumentation(this.Structure);  
+#>
+<#		
+		if(this.Structure != null && this.Structure.IsDeprecated)
+		{
+#>
+    [Obsolete("<#=this.Structure.DeprecationMessage#>")]
+<#
+		}
+        if(this.Structure is ExceptionShape)
+        {
+#>
+    #if !NETSTANDARD
+    [Serializable]
+    #endif
+<#
+        }
+        bool hasStreamingMember = this.Structure?.Members.Any(member => member.IsStreaming) ?? false;
+        if (this.StructureType == StructureType.Response && hasStreamingMember) 
+        {
+#>
+    public partial class <#=this.ClassName#><#=this.BaseClassString#>, IDisposable
+<#
+        }
+        else
+        {
+#>
+    public partial class <#=this.ClassName#><#=this.BaseClassString#>
+<#
+        }
+#>
+	{
+<#
+        if(this.Structure != null)
+        {
+            if(this.IsWrapped)
+            {
+#>
+        private <#=this.Structure.Name#> _response;
+
+        /// <summary>
+        /// Gets and sets the <#=this.Structure.Name#> property.
+        /// </summary>
+        public <#=this.Structure.Name#> <#=this.Structure.Name#>
+        {
+            get { return this._response; }
+            set { this._response = value; }
+        }
+<#
+            }
+            else
+            {
+		        foreach(var member in this.Structure.Members)
+                {
+					if (member.IsExcluded)
+						continue;
+#>
+        private <#=member.DetermineType()#><#= member.IsNullable ? "?" : "" #> <#=member.VariableName#><#= member.ShouldInstantiate ? string.Format(" = new {0}();", member.DetermineType()) : ";"#>
+<#
+                }
+#>
+
+<#
+		        AddSimpleRequestConstructors(this.ClassName, this.Structure, this.Config.Namespace);
+
+                if(this.Structure is ExceptionShape)
+                {
+                    var exceptionShape = (ExceptionShape)this.Structure;
+                    if (exceptionShape.IsRetryable)
+                    {
+#>
+        private RetryableDetails _retryableDetails = new RetryableDetails(<#=exceptionShape.Throttling.ToString().ToLower()#>);
+<#
+#>
+
+<#
+                    }
+#>
+<#@ include file=".\Exceptions\ExceptionConstructors.t4" once="true" #>
+<#@ include file=".\Exceptions\ExceptionSerialization.t4" once="true" #>
+<#
+                }
+		        foreach(var member in this.Structure.Members)
+                {
+					if (member.IsExcluded)
+						continue;
+#>
+<# this.FormatPropertyDocumentation(member); #>
+<#		
+					if(member.IsDeprecated)
+					{
+#>
+		[Obsolete("<#=member.DeprecationMessage#>")]
+<#
+					}
+
+					var propertyAttributes = new List<string>();
+					if(member.IsRequired && !member.IsIdempotent)
+					{
+						propertyAttributes.Add("Required=true");
+					}
+					if (member.Shape.Min.HasValue)
+					{
+						propertyAttributes.Add("Min=" + member.Shape.Min);
+					}
+					if (member.Shape.Max.HasValue)
+					{
+						propertyAttributes.Add("Max=" + member.Shape.Max);
+					}
+					if (propertyAttributes.Count > 0)
+					{
+#>
+		[AWSProperty(<#=string.Join(", ", propertyAttributes)#>)]
+<#
+					}
+#>
+        <#=member.AccessModifier#> <#=member.DetermineType()#><#=member.UseNullable ? "?" : ""#> <#=member.PropertyName#>
+        {
+<#
+                    if(member.IsNullable && !member.UseNullable)
+                    {
+#>
+            get { return this.<#=member.VariableName#>.GetValueOrDefault(); }
+<#
+                    }
+                    else
+                    {
+#>
+            get { return this.<#=member.VariableName#>; }
+<#
+                    }
+#>
+            set { <#=member.IsBackwardsCompatibleDateTimeProperty ? "this." + member.BackwardCompatibilityVariableName + " = " : ""#>this.<#=member.VariableName#> = value; }
+        }
+
+<#
+                    if (member.EmitIsSetProperties)
+                    {
+#>
+        /// <summary>
+        /// This property is set to true if the property <seealso cref="<#=member.PropertyName#>"/>
+        /// is set; false otherwise.
+        /// This property can be used to determine if the related property
+        /// was returned by a service response or if the related property
+        /// should be sent to the service during a service call.
+        /// </summary>
+        /// <returns>
+        /// True if the related property was set or will be sent to a service; false otherwise.
+        /// </returns>
+<#		
+						if(member.IsDeprecated)
+						{
+#>
+		[Obsolete("<#=member.DeprecationMessage#>")]
+<#
+						}
+#>
+        public bool Is<#=member.PropertyName#>Set
+        {
+            get
+            {
+                return Amazon.Util.Internal.InternalSDKUtils.GetIsSet(this.<#=member.VariableName#>);
+            }
+            set
+            {
+                Amazon.Util.Internal.InternalSDKUtils.SetIsSet(value, ref this.<#=member.VariableName#>);
+<#
+                        if(member.IsBackwardsCompatibleDateTimeProperty)
+                        {
+#>  
+                Amazon.Util.Internal.InternalSDKUtils.SetIsSet(value, ref this.<#=member.BackwardCompatibilityVariableName#>);
+<#
+                        }
+#>
+            }
+        }
+
+<#
+                    }
+#>
+        // Check to see if <#=member.PropertyName#> property is set
+        internal bool IsSet<#=member.PropertyName#>()
+        {
+<#
+					if (member.EmitIsSetProperties)
+					{
+#>
+            return this.Is<#=member.PropertyName#>Set; 
+<#
+					}
+					else if (member.IsNullable)
+					{
+#>
+            return this.<#=member.VariableName#>.HasValue; 
+<#
+					}
+					else if (member.IsMap || member.IsList)
+					{
+#>
+            return this.<#=member.VariableName#> != null && this.<#=member.VariableName#>.Count > 0; 
+<#
+					}
+					else
+					{
+#>
+            return this.<#=member.VariableName#> != null;
+<#
+					}
+#>
+        }
+
+<#
+                }
+
+                if (this.StructureType == StructureType.Request && this.Operation.AuthType.HasValue)
+                {
+#>
+        /// <summary>
+        /// Get the signer to use for this request.
+        /// </summary>
+        /// <returns>A signer for this request.</returns>
+        override protected AbstractAWSSigner CreateSigner()
+        {
+<#
+                    switch (this.Operation.AuthType.Value)
+                    {
+                        case OperationAuthType.None:
+#>
+            return new NullSigner();
+<#
+                        break;
+                        case OperationAuthType.V4:
+#>
+            return new AWS4Signer();
+<#
+                        break;
+                        case OperationAuthType.V4UnsignedBody:
+#>
+            return new AWS4Signer(false);
+<#
+                        break;
+                        default:
+                            throw new ArgumentException("Unhandled value for operation authtype:" + this.Operation.AuthType.Value);
+                    }
+#>
+        }
+<#
+                }
+		        if (this.Structure.Members.Any(m => !m.IsExcluded && m.IsBackwardsCompatibleDateTimeProperty))
+		        {
+#>
+#region Backwards compatible properties
+<#
+		            foreach(var member in this.Structure.Members)
+                    {
+				        if (member.IsExcluded || !member.IsBackwardsCompatibleDateTimeProperty)
+				        	continue;
+#>
+        private <#=member.DetermineType()#><#= member.IsNullable ? "?" : "" #> <#=member.BackwardCompatibilityVariableName#><#= member.ShouldInstantiate ? string.Format(" = new {0}();", member.DetermineType()) : ";"#>
+<#
+                    }
+#>
+
+<#
+		            foreach(var member in this.Structure.Members)
+                    {
+				        if (member.IsExcluded || !member.IsBackwardsCompatibleDateTimeProperty)
+				        	continue;
+#>
+<# this.FormatPropertyDocumentation(member, "This property is deprecated. Setting this property results in non-UTC DateTimes " +
+        "not being marshalled correctly. Use " + member.PropertyName + " instead. Setting either " + member.BackwardCompatibilityPropertyName +
+        " or " + member.PropertyName + " results in both " + member.BackwardCompatibilityPropertyName + " and " + 
+        member.PropertyName + " being assigned, the latest assignment to either one of the two property is reflected in " +
+        "the value of both. " + member.BackwardCompatibilityPropertyName + " is provided for backwards compatibility only " +
+        "and assigning a non-Utc DateTime to it results in the wrong timestamp being passed to the service.");#>
+        [Obsolete("Setting this property results in non-UTC DateTimes not being marshalled correctly. " +
+            "Use <#=member.PropertyName#> instead. Setting either <#=member.BackwardCompatibilityPropertyName#> or <#=member.PropertyName#> results in both <#=member.BackwardCompatibilityPropertyName#> and " +
+            "<#=member.PropertyName#> being assigned, the latest assignment to either one of the two property is " + 
+            "reflected in the value of both. <#=member.BackwardCompatibilityPropertyName#> is provided for backwards compatibility only and " +
+            "assigning a non-Utc DateTime to it results in the wrong timestamp being passed to the service.", false)]
+        <#=member.AccessModifier#> <#=member.DetermineType()#><#=member.UseNullable ? "?" : ""#> <#=member.BackwardCompatibilityPropertyName#>
+        {
+            get { return this.<#=member.BackwardCompatibilityVariableName#>.GetValueOrDefault(); }
+            set
+            {
+                this.<#=member.BackwardCompatibilityVariableName#> = value;
+                this.<#=member.VariableName#> = new DateTime(value.Ticks, DateTimeKind.Utc);
+            }
+        }
+<#
+                        if (member.EmitIsSetProperties)
+                        {
+#>
+		/// <summary>
+        /// This property is set to true if the property <seealso cref="<#=member.BackwardCompatibilityPropertyName#>"/>
+        /// is set; false otherwise.
+        /// This property can be used to determine if the related property
+        /// was returned by a service response or if the related property
+        /// should be sent to the service during a service call.
+        /// </summary>
+        /// <returns>
+        /// True if the related property was set or will be sent to a service; false otherwise.
+        /// </returns>
+		[Obsolete("Setting <#=member.BackwardCompatibilityPropertyName#> results in non-UTC DateTimes not being marshalled correctly. Use <#=member.PropertyName#> instead.", false)]
+		public bool Is<#=member.BackwardCompatibilityPropertyName#>Set
+        {
+            get
+            {
+                return this.Is<#=member.PropertyName#>Set;
+            }
+            set
+            {
+                this.Is<#=member.PropertyName#>Set = value;;
+            }
+        }
+<#
+                        }
+                    }
+
+#>
+#endregion
+<#
+                }
+                if (this.Structure is ExceptionShape)
+                {
+                    var exceptionShape = (ExceptionShape)this.Structure;
+                    if (exceptionShape.IsRetryable)
+                    {
+#>
+        /// <summary>
+        /// Flag indicating if the exception is retryable and the associated retry
+        /// details. A null value indicates that the exception is not retryable.
+        /// </summary>
+        public override RetryableDetails Retryable
+        {
+            get
+            {
+                return _retryableDetails;
+            }
+        }
+<#
+                    }
+                }
+            }
+
+        }
+        else //TODO: remove this else clause. It was added just to preserve whitespaces
+        {
+#>
+
+<#
+        }
+        if (this.StructureType == StructureType.Response && hasStreamingMember) 
+        {
+#>
+        #region Dispose Pattern
+
+        private bool _disposed;
+
+        /// <summary>
+        /// Disposes of all managed and unmanaged resources.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+                return;
+
+            if (disposing)
+            {
+<#
+                if (this.Structure != null) 
+                {
+                    foreach (var member in this.Structure.Members) 
+                    {
+                        if (member.IsStreaming) 
+                        {
+#>
+                this.<#=member.VariableName#>?.Dispose();
+                this.<#=member.VariableName#> = null;
+<#
+                        }
+                    }
+                }
+#>
+            }
+
+            this._disposed = true;
+         }
+
+         #endregion
+<#
+        }
+#>
+    }
+}
+
+
+<#+
+    // Set to true when the service model specifies a shape that should be wrapped in a response. ElastiCache CreateCacheCluster is an example of this.
+    public bool IsWrapped { get; set; }
+
+	public Operation Operation { get; set; }
+    public string ClassName { get; set; }
+    public string BaseClass { get; set; }
+    public Shape Structure { get; set; }
+	public StructureType StructureType { get; set; }
+#>

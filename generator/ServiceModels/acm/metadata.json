@@ -1,0 +1,5 @@
+{
+    "base-name": "CertificateManager", 
+    "active": true, 
+    "synopsis": "AWS Certificate Manager (ACM) is an AWS service that makes it easier for you to deploy secure SSL based websites and applications on the AWS platform."
+}

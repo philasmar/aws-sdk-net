@@ -1,0 +1,34 @@
+{
+    "runtimePipelineOverride":{
+        "overrides":[
+            {
+                "operation":"remove",
+                "targetType":"Amazon.Runtime.Internal.CredentialsRetriever"
+            },
+            {
+                "operation":"addBefore",
+                "newType":"Amazon.CognitoSync.Internal.CognitoCredentialsRetriever",
+                "targetType":"Amazon.Runtime.Internal.Marshaller",
+                "constructorInput":"this.Credentials"
+            }
+        ]
+    },
+    "simpleMethods" : {
+        "operations" : {
+            "GetIdentityPoolConfiguration" : {
+                "methodForms" : [
+                    [
+                        "IdentityPoolId"
+                    ]
+                ]
+            },
+            "DescribeIdentityPoolUsage" : {
+                "methodForms" : [
+                    [
+                        "IdentityPoolId"
+                    ]
+                ]
+            }
+        }
+    }
+}

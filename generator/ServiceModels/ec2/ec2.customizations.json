@@ -1,0 +1,462 @@
+{
+    "runtimePipelineOverride": {
+        "overrides": [
+            {
+                "operation": "addBefore",
+                "newType": "Amazon.EC2.Internal.AmazonEC2PreMarshallHandler",
+                "targetType": "Amazon.Runtime.Internal.Marshaller",
+                "constructorInput": "this.Credentials"
+            },
+            {
+                "operation": "addAfter",
+                "newType": "Amazon.EC2.Internal.AmazonEC2PostMarshallHandler",
+                "targetType": "Amazon.Runtime.Internal.Marshaller"
+            },
+            {
+                "operation": "addBefore",
+                "newType": "Amazon.EC2.Internal.AmazonEC2ResponseHandler",
+                "targetType": "Amazon.Runtime.Internal.Unmarshaller"
+            },
+			{
+                "condition":"this.Config.RetryMode == RequestRetryMode.Legacy",
+                "operation":"replace",
+                "newType":"Amazon.Runtime.Internal.RetryHandler",
+                "targetType":"Amazon.Runtime.Internal.RetryHandler",
+                "constructorInput":"new Amazon.EC2.Internal.EC2RetryPolicy(this.Config)"
+            },
+			{
+                "condition":"this.Config.RetryMode == RequestRetryMode.Standard",
+                "operation":"replace",
+                "newType":"Amazon.Runtime.Internal.RetryHandler",
+                "targetType":"Amazon.Runtime.Internal.RetryHandler",
+                "constructorInput":"new Amazon.EC2.Internal.EC2StandardRetryPolicy(this.Config)"
+            },
+			{
+                "condition":"this.Config.RetryMode == RequestRetryMode.Adaptive",
+                "operation":"replace",
+                "newType":"Amazon.Runtime.Internal.RetryHandler",
+                "targetType":"Amazon.Runtime.Internal.RetryHandler",
+                "constructorInput":"new Amazon.EC2.Internal.EC2AdaptiveRetryPolicy(this.Config)"
+            }
+        ]
+    },
+    "noArgOverloads": [
+        "AllocateAddress",
+        "CreateInternetGateway",
+        "DeleteSpotDatafeedSubscription",
+        "DescribeAccountAttributes",
+        "DescribeAddresses",
+        "DescribeAvailabilityZones",
+        "DescribeBundleTasks",
+        "DescribeConversionTasks",
+        "DescribeCustomerGateways",
+        "DescribeDhcpOptions",
+        "DescribeExportTasks",
+        "DescribeImages",
+        "DescribeInstanceStatus",
+        "DescribeInstances",
+        "DescribeInternetGateways",
+        "DescribeKeyPairs",
+        "DescribeNetworkAcls",
+        "DescribeNetworkInterfaces",
+        "DescribePlacementGroups",
+        "DescribeRegions",
+        "DescribeReservedInstances",
+        "DescribeReservedInstancesListings",
+        "DescribeReservedInstancesModifications",
+        "DescribeReservedInstancesOfferings",
+        "DescribeRouteTables",
+        "DescribeSecurityGroups",
+        "DescribeSnapshots",
+        "DescribeSpotDatafeedSubscription",
+        "DescribeSpotInstanceRequests",
+        "DescribeSpotPriceHistory",
+        "DescribeSubnets",
+        "DescribeTags",
+        "DescribeVolumeStatus",
+        "DescribeVolumes",
+        "DescribeVpcPeeringConnections",
+        "DescribeVpcs",
+        "DescribeVpnConnections",
+        "DescribeVpnGateways"
+    ],
+    "suppressResultGeneration": [
+        "DeleteVpcPeeringConnection",
+        "RejectVpcPeeringConnection"
+    ],
+    "shapeSubstitutions": {
+        "AttributeValue": {
+            "emitAsShape": "String",
+            "emitFromMember": "Value",
+            "listMemberSuffixExclusions": [
+                "CreateDhcpOptions"
+            ]
+        },
+        "AttributeBooleanValue": {
+            "emitAsShape": "Boolean",
+            "emitFromMember": "Value"
+        },
+        "Blob": {
+            "emitAsShape": "String"
+        },
+        "BlobAttributeValue": {
+            "emitAsShape": "String",
+            "emitFromMember": "Value"
+        },
+        "NewDhcpConfiguration": {
+            "emitAsShape": "DhcpConfiguration"
+        },
+        "RunInstancesMonitoringEnabled": {
+            "emitAsShape": "Boolean",
+            "emitFromMember": "Enabled"
+        },
+        "RequestSpotLaunchSpecification": {
+            "emitAsShape": "LaunchSpecification"
+        }
+    },
+	"dataTypeSwap" : {
+        "SpotFleetRequestConfigData": {
+            "ValidFrom": {
+                "Type": "DateTime",
+                "Marshaller": "Amazon.EC2.Internal.CustomMarshallTransformations.ConvertDateTimeISOWithoutMillisecondsUtc"
+            },
+            "ValidUntil": {
+                "Type": "DateTime",
+                "Marshaller": "Amazon.EC2.Internal.CustomMarshallTransformations.ConvertDateTimeISOWithoutMillisecondsUtc"
+            }
+        },
+        "DescribeSpotFleetRequestHistoryRequest": {
+            "StartTime": {
+                "Type": "DateTime",
+                "Marshaller": "Amazon.EC2.Internal.CustomMarshallTransformations.ConvertDateTimeISOWithoutMillisecondsUtc"
+            }
+        }
+	},
+    "shapeModifiers": {
+        "*": {
+            "exclude": [
+                "DryRun"
+            ]
+        },
+        "AttachVolumeResponse": {
+            "modify": [
+                {
+                    "VolumeAttachment": { "emitPropertyName": "Attachment" }
+                }
+            ]
+        },
+        "AuthorizeSecurityGroupEgressRequest": {
+            "exclude": [
+                "SourceSecurityGroupName",
+                "SourceSecurityGroupOwnerId",
+                "IpProtocol",
+                "FromPort",
+                "ToPort",
+                "CidrIp"
+            ]
+        },
+        "AuthorizeSecurityGroupIngressRequest": {
+            "exclude": [
+                "SourceSecurityGroupName",
+                "SourceSecurityGroupOwnerId",
+                "IpProtocol",
+                "FromPort",
+                "ToPort",
+                "CidrIp"
+            ]
+        },
+        "CidrBlock": {
+            "modify": [
+                {
+                    "CidrBlock": { "emitPropertyName": "Cidr" }
+                }
+            ]
+        },
+        "ClientData": {
+            "backwardsCompatibleDateTimeProperties": [
+                "UploadEnd",
+                "UploadStart"
+            ]
+        },
+        "CopySnapshotRequest": {
+            "modify": [
+                {
+                    "PresignedUrl": { "accessModifier": "internal" }
+                }
+            ]
+        },
+        "CreateFleetRequest": {
+            "backwardsCompatibleDateTimeProperties": [
+                "ValidFrom",
+                "ValidUntil"
+            ]
+        },
+        "DeleteVpcPeeringConnectionResponse": {
+            "exclude": [ "Return" ]
+        },
+        "DescribeFleetHistoryRequest": {
+            "backwardsCompatibleDateTimeProperties": [
+                "StartTime"
+            ]
+        },
+        "DescribeSpotFleetRequestHistoryRequest": {
+            "backwardsCompatibleDateTimeProperties": [
+                "StartTime"
+            ]
+        },
+        "DescribeSpotPriceHistoryRequest": {
+            "backwardsCompatibleDateTimeProperties": [
+                "EndTime",
+                "StartTime"
+            ]
+        },
+        "DetachVolumeResponse": {
+            "modify": [
+                {
+                    "VolumeAttachment": { "emitPropertyName": "Attachment" }
+                }
+            ]
+        },
+        "InstanceCount": {
+            "modify": [
+                {
+                    "InstanceCount": { "emitPropertyName": "Count" }
+                }
+            ]
+        },
+        "ImportInstanceLaunchSpecification": {
+            "modify": [
+                {
+                    "Monitoring": { "locationName": "Monitoring.Enabled" }
+                }
+            ]
+        },
+        "InstanceStatus": {
+            "modify": [
+                {
+                    "InstanceStatus": { "emitPropertyName": "Status" }
+                }
+            ]
+        },
+        "Ipv6CidrBlock": {
+            "modify": [
+                {
+                    "Ipv6CidrBlock": { "emitPropertyName": "Value" }
+                }
+            ]
+        },
+        "IpPermission": {
+            "modify": [
+                {
+                    "IpRanges": { "emitPropertyName": "Ipv4Ranges" }
+                }
+            ]
+        },
+        "LaunchSpecification": {
+            "modify": [
+                {
+                    "SecurityGroups": { "emitPropertyName": "AllSecurityGroups" }
+                },
+                {
+                    "Monitoring": { "emitPropertyName": "MonitoringEnabled" }
+                }
+            ],
+            "inject": [
+                {
+                    "SecurityGroups": {
+                        "shape": "GroupNameStringList",
+                        "documentation": "<p>One or more security group names.</p>",
+                        "locationName": "securityGroup"
+                    }
+                }
+            ]
+        },
+        "LaunchTemplateSpotMarketOptionsRequest": {
+            "backwardsCompatibleDateTimeProperties": [
+                "ValidUntil"
+            ]
+        },
+        "ModifyVpcEndpointResult": {
+            "exclude": [ "Return" ]
+        },
+        "PrefixListId": {
+            "modify": [
+                {
+                    "PrefixListId": { "emitPropertyName": "Id" }
+                }
+            ]
+        },
+        "RequestSpotInstancesRequest": {
+            "backwardsCompatibleDateTimeProperties": [
+                "ValidFrom",
+                "ValidUntil"
+            ]
+        },
+        "RequestSpotLaunchSpecification": {
+            "modify": [
+                {
+                    "SecurityGroups": {
+                        "emitPropertyName": "AllSecurityGroups",
+                        "customMarshall": true
+                    }
+                },
+                {
+                    "Monitoring": { "emitPropertyName": "MonitoringEnabled" }
+                },
+                {
+                    "NetworkInterfaces": { "locationName": "NetworkInterface" }
+                }
+            ],
+            "inject": [
+                {
+                    "SecurityGroups": {
+                        "shape": "GroupNameStringList",
+                        "documentation": "<p>One or more security group names.</p>",
+                        "customMarshall": true
+                    }
+                }
+            ]
+        },
+        "Reservation": {
+            "inject": [
+                {
+                    "GroupNames": {
+                        "shape": "GroupNameStringList",
+                        "documentation": "<p>One or more security group names.</p>",
+                        "locationName": "groupName"
+                    }
+                }
+            ]
+        },
+        "ReservedInstancesId": {
+            "modify": [
+                {
+                    "ReservedInstancesId": { "emitPropertyName": "Id" }
+                }
+            ]
+        },
+        "ReportInstanceStatusRequest": {
+            "backwardsCompatibleDateTimeProperties": [
+                "EndTime",
+                "StartTime"
+            ]
+        },
+        "RevokeSecurityGroupEgressRequest": {
+            "exclude": [
+                "SourceSecurityGroupName",
+                "SourceSecurityGroupOwnerId",
+                "IpProtocol",
+                "FromPort",
+                "ToPort",
+                "CidrIp"
+            ]
+        },
+        "SpotFleetRequestConfigData": {
+            "backwardsCompatibleDateTimeProperties": [
+                "ValidFrom",
+                "ValidUntil"
+            ]
+        },
+        "SpotPrice": {
+            "modify": [
+                {
+                    "SpotPrice": { "emitPropertyName": "Price" }
+                }
+            ]
+        },
+        "RevokeSecurityGroupIngressRequest": {
+            "exclude": [
+                "SourceSecurityGroupName",
+                "SourceSecurityGroupOwnerId",
+                "IpProtocol",
+                "FromPort",
+                "ToPort",
+                "CidrIp"
+            ]
+        },
+        "SlotDateTimeRangeRequest": {
+            "backwardsCompatibleDateTimeProperties": [
+                "EarliestTime",
+                "LatestTime"
+            ]
+        },
+        "SlotStartTimeRangeRequest": {
+            "backwardsCompatibleDateTimeProperties": [
+                "EarliestTime",
+                "LatestTime"
+            ]
+        },
+        "SpotFleetRequestConfig": {
+            "modify": [
+                {
+                    "SpotFleetRequestConfig": { "emitPropertyName": "ConfigData" }
+                }
+            ]
+        },
+        "SpotMarketOptions": {
+            "backwardsCompatibleDateTimeProperties": [
+                "ValidUntil"
+            ]
+        }
+    },
+    "operationModifiers": {
+        "ActivateLicense": {
+            "exclude": true
+        },
+        "AttachVolume": {
+            "useWrappingResult": true,
+            "wrappedResultShape": "VolumeAttachment",
+            "wrappedResultMember": "Attachment"
+        },
+        "CreateDhcpOptions": {
+            "marshallNameOverrides": [
+                {
+                    "DhcpConfiguration": {
+                        "Values": { "marshallName": "Value" }
+                    }
+                }
+            ]
+        },
+        "CreateKeyPair": {
+            "useWrappingResult": true,
+            "wrappedResultShape": "KeyPair",
+            "wrappedResultMember": "KeyPair"
+        },
+        "CreateSnapshot": {
+            "useWrappingResult": true,
+            "wrappedResultShape": "Snapshot",
+            "wrappedResultMember": "Snapshot"
+        },
+        "CreateVolume": {
+            "useWrappingResult": true,
+            "wrappedResultShape": "Volume",
+            "wrappedResultMember": "Volume"
+        },
+        "DeactivateLicense": {
+            "exclude": true
+        },
+        "DescribeImageAttribute": {
+            "useWrappingResult": true,
+            "wrappedResultShape": "ImageAttribute",
+            "wrappedResultMember": "ImageAttribute"
+        },
+        "DescribeInstanceAttribute": {
+            "useWrappingResult": true,
+            "wrappedResultShape": "InstanceAttribute",
+            "wrappedResultMember": "InstanceAttribute"
+        },
+        "DescribeLicenses": {
+            "exclude": true
+        },
+        "DetachVolume": {
+            "useWrappingResult": true,
+            "wrappedResultShape": "VolumeAttachment",
+            "wrappedResultMember": "Attachment"
+        },
+        "RunInstances": {
+            "useWrappingResult": true,
+            "wrappedResultShape": "Reservation",
+            "wrappedResultMember": "Reservation"
+        }
+    }
+}

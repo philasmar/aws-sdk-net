@@ -1,0 +1,29 @@
+{
+    "noArgOverloads": [
+      "DescribeCacheClusters",
+      "DescribeCacheEngineVersions",
+      "DescribeCacheParameterGroups",
+      "DescribeCacheSecurityGroups",
+      "DescribeCacheSubnetGroups",
+      "DescribeEvents",
+      "DescribeReplicationGroups",
+      "DescribeReservedCacheNodes",
+      "DescribeReservedCacheNodesOfferings",
+      "DescribeSnapshots"
+    ]
+    "shapeModifiers": {
+        "DescribeEventsMessage": {
+            "backwardsCompatibleDateTimeProperties": [
+                "StartTime",
+                "EndTime"
+            ]
+        },
+        "ModifyReplicationGroupMessage": {
+            "modify": [
+                {
+                    "NodeGroupId": { "deprecatedMessage": "This field is deprecated and is no longer used." }
+                }
+            ]
+        }
+    }
+}

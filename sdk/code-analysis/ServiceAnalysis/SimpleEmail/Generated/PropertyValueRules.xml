@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-16"?>
+<property-value-rules>
+  <property-value-rule>
+    <property>Amazon.SimpleEmail.Model.DeleteIdentityPolicyRequest.PolicyName</property>
+    <min>1</min>
+    <max>64</max>
+  </property-value-rule>
+  <property-value-rule>
+    <property>Amazon.SimpleEmail.Model.ListCustomVerificationEmailTemplatesRequest.MaxResults</property>
+    <min>1</min>
+    <max>50</max>
+  </property-value-rule>
+  <property-value-rule>
+    <property>Amazon.SimpleEmail.Model.PutIdentityPolicyRequest.Policy</property>
+    <min>1</min>
+  </property-value-rule>
+  <property-value-rule>
+    <property>Amazon.SimpleEmail.Model.PutIdentityPolicyRequest.PolicyName</property>
+    <min>1</min>
+    <max>64</max>
+  </property-value-rule>
+  <property-value-rule>
+    <property>Amazon.SimpleEmail.Model.SendBulkTemplatedEmailRequest.DefaultTemplateData</property>
+    <max>262144</max>
+  </property-value-rule>
+  <property-value-rule>
+    <property>Amazon.SimpleEmail.Model.SendTemplatedEmailRequest.TemplateData</property>
+    <max>262144</max>
+  </property-value-rule>
+  <property-value-rule>
+    <property>Amazon.SimpleEmail.Model.TestRenderTemplateRequest.TemplateData</property>
+    <max>262144</max>
+  </property-value-rule>
+  <property-value-rule>
+    <property>Amazon.SimpleEmail.Model.BulkEmailDestination.ReplacementTemplateData</property>
+    <max>262144</max>
+  </property-value-rule>
+</property-value-rules>

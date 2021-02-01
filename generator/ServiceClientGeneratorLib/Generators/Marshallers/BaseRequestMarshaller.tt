@@ -1,0 +1,51 @@
+﻿<#@ template language="C#" inherits="BaseMarshaller" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+
+<#+
+    // The operation the marshaller will be used on
+	public Operation Operation { get; set; }	
+
+    Shape _structure;
+    public Shape Structure 
+    { 
+        get 
+        { 
+            if(this.Operation != null)
+			{
+				if(this.Operation.IsResponseWrapped)
+					return this.Operation.ResponseStructure.Members[0].Shape;
+				else
+					return this.Operation.ResponseStructure;
+			}
+            return this._structure; 
+        }
+        set { this._structure = value; }
+    }
+
+    protected void AddRequestSingletonMethod()
+    {
+#>
+        private static <#=this.Operation.Name #>RequestMarshaller _instance = new <#=this.Operation.Name #>RequestMarshaller();        
+
+		internal static <#=this.Operation.Name #>RequestMarshaller GetInstance()
+		{
+			return _instance;
+		}
+
+        /// <summary>
+        /// Gets the singleton.
+        /// </summary>  
+		public static <#=this.Operation.Name #>RequestMarshaller Instance
+		{
+			get
+			{
+				return _instance;
+			}
+		}
+
+<#+
+    }
+#>

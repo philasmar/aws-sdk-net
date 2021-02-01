@@ -1,0 +1,59 @@
+<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+
+<?xml version="1.0" encoding="utf-8"?>
+<package> 
+  <metadata> 
+    <id>AWSSDK.Core</id>
+    <title>AWSSDK - Core Runtime</title>
+    <version><#=this.Session["FileVersion"]#><#=this.Session["NuGetPreviewFlag"]#></version> 
+    <authors>Amazon Web Services</authors>
+    <description>The Amazon Web Services SDK for .NET - Core Runtime</description>
+    <language>en-US</language>
+    <licenseUrl>http://aws.amazon.com/apache2.0/</licenseUrl>
+    <projectUrl>https://github.com/aws/aws-sdk-net/</projectUrl>
+    <tags>AWS Amazon cloud aws-sdk-v3</tags>
+    <iconUrl>https://sdk-for-net.amazonwebservices.com/images/AWSLogo128x128.png</iconUrl>
+    <dependencies>
+      <group targetFramework="net35">
+      </group>
+      <group targetFramework="net45">
+      </group>
+      <group targetFramework="netstandard1.3">
+        <dependency id="System.Net.Requests" version="4.0.11" />
+        <dependency id="System.Reflection.TypeExtensions" version="4.1.0" />
+        <dependency id="System.Security.Cryptography.Csp" version="4.0.0" />
+        <dependency id="System.Threading.Thread" version="4.0.0" />
+        <dependency id="Microsoft.CSharp" version="4.0.1" />
+      </group>
+	    <group targetFramework="netstandard2.0">
+        <dependency id="Microsoft.Bcl.AsyncInterfaces" version="1.1.0" />
+      </group>
+      <group targetFramework="netcoreapp3.1">
+      </group>
+    </dependencies>
+  </metadata> 
+  <files>
+    <file src="..\..\nuget-content\account-management.ps1" target="tools" />
+
+    <file src=".\bin\Release\net35\AWSSDK.Core.dll" target="lib\net35" />
+    <file src=".\bin\Release\net35\AWSSDK.Core.xml" target="lib\net35" />
+    <file src=".\bin\Release\net35\AWSSDK.Core.pdb" target="lib\net35" />
+
+    <file src=".\bin\Release\net45\AWSSDK.Core.dll" target="lib\net45" />
+    <file src=".\bin\Release\net45\AWSSDK.Core.xml" target="lib\net45" />
+    <file src=".\bin\Release\net45\AWSSDK.Core.pdb" target="lib\net45" />
+
+    <file src=".\bin\Release\netstandard1.3\AWSSDK.Core.dll" target="lib\netstandard1.3"/>
+    <file src=".\bin\Release\netstandard1.3\AWSSDK.Core.xml" target="lib\netstandard1.3"/>
+    <file src=".\bin\Release\netstandard1.3\AWSSDK.Core.pdb" target="lib\netstandard1.3"/>
+  
+    <file src=".\bin\Release\netstandard2.0\AWSSDK.Core.dll" target="lib\netstandard2.0"/>
+    <file src=".\bin\Release\netstandard2.0\AWSSDK.Core.xml" target="lib\netstandard2.0"/>
+    <file src=".\bin\Release\netstandard2.0\AWSSDK.Core.pdb" target="lib\netstandard2.0"/>
+
+    <file src=".\bin\Release\netcoreapp3.1\AWSSDK.Core.dll" target="lib\netcoreapp3.1"/>
+    <file src=".\bin\Release\netcoreapp3.1\AWSSDK.Core.xml" target="lib\netcoreapp3.1"/>
+    <file src=".\bin\Release\netcoreapp3.1\AWSSDK.Core.pdb" target="lib\netcoreapp3.1"/>
+  </files>
+</package>

@@ -1,0 +1,8 @@
+{
+    "active": true, 
+    "dependencies": [
+        "SQS", 
+        "SimpleNotificationService"
+    ], 
+    "synopsis": "Amazon Glacier is a secure, durable, and extremely low-cost storage service for data archiving and online backup."
+}

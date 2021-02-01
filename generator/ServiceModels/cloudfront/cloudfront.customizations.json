@@ -1,0 +1,60 @@
+{
+    "noArgOverloads": [
+        "ListDistributions",
+        "ListCloudFrontOriginAccessIdentities",
+        "DeleteCloudFrontOriginAccessIdentity",
+        "DeleteDistribution",
+        "DeleteStreamingDistribution",
+        "GetCloudFrontOriginAccessIdentity",
+        "GetCloudFrontOriginAccessIdentityConfig",
+        "GetDistribution",
+        "GetDistributionConfig",
+        "GetStreamingDistribution",
+        "GetStreamingDistributionConfig",
+        "ListStreamingDistributions"
+    ],
+    "shapeModifiers": {
+        "ViewerCertificate": {
+            "modify": [
+                {
+                    "Certificate": { "deprecatedMessage": "This field has been deprecated. Use one of the following fields instead: ACMCertificateArn, IAMCertificateId or CloudFrontDefaultCertificate." }
+                },
+                {
+                    "CertificateSource": { "deprecatedMessage": "This field has been deprecated. Use one of the following fields instead: ACMCertificateArn, IAMCertificateId or CloudFrontDefaultCertificate." }
+                }
+            ]
+        },
+        "CacheBehavior" : {
+            "modify": [
+                {
+                    "DefaultTTL" : { "deprecatedMessage": "This field is deprecated. Use CachePolicy instead."}
+                },
+                {
+                    "ForwardedValues" : { "deprecatedMessage": "This field is deprecated. Use CachePolicy instead."}
+                },
+                {
+                    "MaxTTL" : { "deprecatedMessage": "This field is deprecated. Use CachePolicy instead."}
+                },
+                {
+                    "MinTTL" : { "deprecatedMessage": "This field is deprecated. Use CachePolicy instead."}
+                }            
+            ]
+        },
+        "DefaultCacheBehavior" : {
+            "modify": [
+                {
+                    "DefaultTTL" : { "deprecatedMessage": "This field is deprecated. Use CachePolicy instead."}
+                },
+                {
+                    "ForwardedValues" : { "deprecatedMessage": "This field is deprecated. Use CachePolicy instead."}
+                },
+                {
+                    "MaxTTL" : { "deprecatedMessage": "This field is deprecated. Use CachePolicy instead."}
+                },
+                {
+                    "MinTTL" : { "deprecatedMessage": "This field is deprecated. Use CachePolicy instead."}
+                }            
+            ]
+        }        
+    }
+}

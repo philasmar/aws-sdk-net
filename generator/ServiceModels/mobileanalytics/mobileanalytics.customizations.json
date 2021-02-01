@@ -1,0 +1,40 @@
+{
+    "dataTypeSwap": {
+        "Session": {
+            "startTimestamp": {
+                "Type": "DateTime",
+                "Marshaller": "Amazon.Runtime.Internal.Util.StringUtils.FromDateTimeToISO8601",
+                "Unmarshaller": "Amazon.Runtime.Internal.Transform.DateTimeUnmarshaller"
+            },
+            "stopTimestamp": {
+                "Type": "DateTime",
+                "Marshaller": "Amazon.Runtime.Internal.Util.StringUtils.FromDateTimeToISO8601",
+                "Unmarshaller": "Amazon.Runtime.Internal.Transform.DateTimeUnmarshaller"
+            }
+        },
+        "Event": {
+            "timestamp": {
+                "Type": "DateTime",
+                "Marshaller": "Amazon.Runtime.Internal.Util.StringUtils.FromDateTimeToISO8601",
+                "Unmarshaller": "Amazon.Runtime.Internal.Transform.DateTimeUnmarshaller"
+            }
+        }
+    },
+    "generateUnmarshaller": [
+        "Event",
+        "Session"
+    ],
+    "shapeModifiers": {
+        "Event": {
+            "backwardsCompatibleDateTimeProperties": [
+                "Timestamp"
+            ]
+        },
+        "Session": {
+            "backwardsCompatibleDateTimeProperties": [
+                "StartTimestamp",
+                "StopTimestamp"
+            ]
+        }
+    }
+}

@@ -1,0 +1,310 @@
+﻿<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+   <RunAnalyzersDuringBuild Condition="'$(RunAnalyzersDuringBuild)'==''">true</RunAnalyzersDuringBuild>
+<#
+    if (this.Project.TargetFrameworks.Count() == 1)
+    {
+#>
+    <TargetFramework><#=this.Project.TargetFrameworks.Single() #></TargetFramework>
+<#
+    }
+    else
+    {
+#>
+    <TargetFrameworks><#=
+                string.Join(";", this.Project.TargetFrameworks) #></TargetFrameworks>
+<#
+    }
+#>
+    <DefineConstants>$(DefineConstants);<#=
+                    string.Join(";", this.Project.DefineConstants) #></DefineConstants>
+<#
+    if (this.Project.TargetFrameworks.Contains("netstandard1.3"))
+    {
+#>
+    <DefineConstants Condition="'$(TargetFramework)' == 'netstandard1.3'">$(DefineConstants);NETSTANDARD13;ADD_SUPPORT_ICLONEABLE;ADD_SUPPORT_IORDERED_DICTIONARY</DefineConstants>
+<#
+    }
+    if (this.Project.TargetFrameworks.Contains("netstandard2.0"))
+    {
+#>
+    <DefineConstants Condition="'$(TargetFramework)' == 'netstandard2.0'">$(DefineConstants);NETSTANDARD20</DefineConstants>
+<#
+    }
+    if (this.Project.TargetFrameworks.Contains("netcoreapp3.1"))
+    {
+#>
+    <DefineConstants Condition="'$(TargetFramework)' == 'netcoreapp3.1'">$(DefineConstants);AWS_ASYNC_ENUMERABLES_API</DefineConstants>
+<#
+    }
+#>
+    <DebugType>portable</DebugType>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <AssemblyName><#=this.Project.AssemblyName#></AssemblyName>
+    <PackageId><#=this.Project.AssemblyName#></PackageId>
+
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
+    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+
+<#
+    if (!string.IsNullOrEmpty(this.Project.FrameworkPathOverride))
+    {
+#>
+    <!-- workaround per https://github.com/Microsoft/msbuild/issues/1333 -->
+    <FrameworkPathOverride><#=this.Project.FrameworkPathOverride #></FrameworkPathOverride>
+<#
+    }
+
+    if (!string.IsNullOrEmpty(this.Project.SupressWarnings))
+    {
+#>
+    <NoWarn><#=this.Project.SupressWarnings #></NoWarn>
+<#
+    }
+
+    if (!string.IsNullOrEmpty(this.Project.OutputPathOverride))
+    {
+#>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <OutputPath><#=this.Project.OutputPathOverride #></OutputPath>
+<#
+    }
+    if (this.Project.TargetFrameworks.Contains("netstandard1.3"))
+    {
+#>
+    <NetStandardImplicitPackageVersion  Condition="'$(TargetFramework)' == 'netstandard1.3'">1.6.0</NetStandardImplicitPackageVersion>
+<#
+    }
+#>
+  </PropertyGroup>
+<#
+    if (this.Project.TargetFrameworks.Contains("netstandard2.0"))
+    {
+#>
+  <!-- Async Enumerable Compatibility -->
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <LangVersion>8.0</LangVersion>
+  </PropertyGroup>
+<#
+    }
+#>
+<#
+	if (!this.Project.AssemblyName.Contains("UnitTests"))
+	{
+#>
+  <PropertyGroup Condition=" '$(RuleSetFileForBuild)' == 'false' Or '$(RuleSetFileForBuild)' == '' ">
+	<CodeAnalysisRuleSet><#=this.Project.FxcopAnalyzerRuleSetFilePath#></CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(RuleSetFileForBuild)' == 'true' ">
+	<CodeAnalysisRuleSet><#=this.Project.FxcopAnalyzerRuleSetFilePathForBuild#></CodeAnalysisRuleSet>
+  </PropertyGroup>
+
+<#
+	}
+    if (this.Project.SignBinaries)
+    {
+#>
+  <Choose>
+    <When Condition=" '$(AWSKeyFile)' == '' ">
+      <PropertyGroup>
+        <AssemblyOriginatorKeyFile>..\..\..\awssdk.dll.snk</AssemblyOriginatorKeyFile>
+      </PropertyGroup>
+    </When>
+    <Otherwise>
+      <PropertyGroup>
+        <AssemblyOriginatorKeyFile>$(AWSKeyFile)</AssemblyOriginatorKeyFile>
+      </PropertyGroup>
+    </Otherwise>
+  </Choose>
+
+<#
+    }
+    if(this.Project.CustomRoslynAnalyzersDllDirectory != null)
+    {
+#>
+  <ItemGroup Condition="$(RunAnalyzersDuringBuild)">
+    <Analyzer Include= "<#=this.Project.CustomRoslynAnalyzersDllDirectory#>" />
+  </ItemGroup>
+<#
+    }
+    if(this.Project.IndividualFileIncludes != null)
+    {
+#>
+  <ItemGroup>
+<#
+    foreach (var compileIncludeEntry in this.Project.IndividualFileIncludes)
+    {
+#>
+    <Compile Include="<#=compileIncludeEntry #>"/>
+<#
+    }
+#>
+  </ItemGroup>
+<#
+    }
+
+    if (this.Project.CompileRemoveList != null)
+    {
+#>
+  <ItemGroup>
+<#
+    foreach (var compileRemoveEntry in this.Project.CompileRemoveList)
+    {
+        if (compileRemoveEntry == "bin" || compileRemoveEntry == "obj")
+        {
+#>
+    <Compile Remove="**/<#=compileRemoveEntry #>/**"/>
+	<None Remove="**/<#=compileRemoveEntry #>/**" />
+<#
+    continue;
+        }
+#>
+    <Compile Remove="**/<#=compileRemoveEntry #>/**"/>
+<#
+    }
+#>
+  </ItemGroup>
+
+<#
+    }
+#>
+<#
+    if (this.Project.ProjectReferences != null)
+    {
+#>
+  <ItemGroup>
+<#
+    foreach (var projectReference in this.Project.ProjectReferences)
+    {
+#>
+    <ProjectReference Include="<#=projectReference.IncludePath #>"/>
+<#
+    }
+#>
+  </ItemGroup>
+
+<#
+    }
+#>
+<#
+    if (this.Project.PackageReferences != null)
+    {
+#>
+  <ItemGroup Condition="$(RunAnalyzersDuringBuild)">
+<#
+        foreach(var package in this.Project.PackageReferences.Where(p => p.IsAnalyzer))
+        {
+            if(package.HasPrivateAssets)
+            {
+#>
+        <PackageReference Include="<#=package.Include#>" Version="<#=package.Version#>">
+            <PrivateAssets><#=package.PrivateAssets#></PrivateAssets>
+        </PackageReference>
+<#
+            }
+            else
+            {
+#>
+	    <PackageReference Include="<#=package.Include#>" Version="<#=package.Version#>"/>
+<#
+		    }
+        }
+#>
+  </ItemGroup>
+  <ItemGroup>
+<#
+        foreach(var package in this.Project.PackageReferences.Where(p => !p.IsAnalyzer))
+        {
+            if(package.HasPrivateAssets)
+            {
+#>
+        <PackageReference Include="<#=package.Include#>" Version="<#=package.Version#>">
+            <PrivateAssets><#=package.PrivateAssets#></PrivateAssets>
+        </PackageReference>
+<#
+            }
+            else
+            {
+#>
+	    <PackageReference Include="<#=package.Include#>" Version="<#=package.Version#>"/>
+<#
+		    }
+        }
+#>
+  </ItemGroup>
+
+<#
+    }
+    if (this.Project.ReferenceDependencies != null)
+    {
+#>
+  <ItemGroup>
+<#
+        foreach (var reference in this.Project.ReferenceDependencies)
+        {
+            if (string.IsNullOrEmpty(reference.HintPath))
+            {
+#>
+    <Reference Include="<#=reference.Name #>"/>
+<#
+            }
+            else
+            {
+#>
+    <Reference Include="<#=reference.Name #>">
+        <HintPath><#=reference.HintPath #></HintPath>
+    </Reference>
+<#
+            }
+        }
+#>
+  </ItemGroup>
+
+<#
+    }
+    if (this.Project.EmbeddedResources != null)
+    {
+#>
+  <ItemGroup>
+<#
+    foreach (var resource in this.Project.EmbeddedResources)
+    {
+#>
+    <EmbeddedResource Include="<#=resource #>"/>
+<#
+    }
+#>
+  </ItemGroup>
+<#
+    }
+
+    if (this.Project.Services != null)
+    {
+#>
+  <ItemGroup>
+<#
+        foreach (var service in this.Project.Services)
+        {
+#>
+    <Service Include="<#=service #>"/>
+<#
+        }
+#>
+  </ItemGroup>
+<#
+    }
+#>
+</Project>
+
+<#+
+    public Project Project { get; set; }
+#>

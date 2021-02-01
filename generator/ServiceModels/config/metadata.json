@@ -1,0 +1,5 @@
+{
+    "base-name": "ConfigService", 
+    "active": true, 
+    "synopsis": "AWS Config is a fully managed service that provides you with an AWS resource inventory, configuration history, and configuration change notifications to enable security and governance."
+}
