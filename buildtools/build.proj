@@ -124,7 +124,7 @@
 
     <Target Name="restore-nuget">
         <Message Text="Restore nuget packages"/>
-        <Exec Command="..\sdk\.nuget\NuGet.exe restore ..\sdk\AWSSDK.CodeAnalysis.sln"/>
+        <!-- <Exec Command="..\sdk\.nuget\NuGet.exe restore ..\sdk\AWSSDK.CodeAnalysis.sln"/> -->
     </Target>
 
     <Target Name="restore-nuget-service">
@@ -186,9 +186,9 @@
 
 
     <Target Name="build-code-analysis" DependsOnTargets="restore-nuget;run-generator;build-custom-roslyn-analyzer;override-endpoints-file">
-        <MSBuild Projects="..\sdk\AWSSDK.CodeAnalysis.sln"
+        <!-- <MSBuild Projects="..\sdk\AWSSDK.CodeAnalysis.sln"
             Targets="Clean;Build"
-            Properties="Configuration=$(Configuration);AWSKeyFile=$(CustomSnkFileLocation)" />
+            Properties="Configuration=$(Configuration);AWSKeyFile=$(CustomSnkFileLocation)" /> -->
     </Target>
 
     <Target Name="build-sdk-netstandard" DependsOnTargets="restore-nuget;run-generator;override-endpoints-file">
